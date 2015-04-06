@@ -41,7 +41,7 @@ class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
         else:
             self.rb_OtherCrs.setChecked(True)
         self.__displayAuthid()
-    
+            
     def selectOtherCrs(self, checked):
         if checked == True:
             self.pb_ChooseCrs.setEnabled(True)

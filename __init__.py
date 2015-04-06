@@ -29,11 +29,11 @@
 #---------------------------------------------------------------------
 from numericalDigitize import NumericalDigitize     
 def name():
-  return "NumericalDigitize"
+  return "NumericDigitize_NG"
 def description():
   return "Digitize with just the keyboard"
 def version():
-  return "Version 0.2.0"
+  return "Version 0.2.2"
 def classFactory(iface):
   return NumericalDigitize(iface)
 def qgisMinimumVersion():

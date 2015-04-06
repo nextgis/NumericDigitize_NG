@@ -1,10 +1,10 @@
 ; the next section is mandatory
 [general]
 ; start of mandatory metadata
-name=NumericalDigitize
+name=NumericDigitize_NG
 qgisMinimumVersion=2.0
 description=Digitize with just the keyboard
-version=version Version 0.2.0
+version=version Version 0.2.2
 author=Cédric Möri
 email=cmoe@geoing.ch
 ; end of mandatory metadata
@@ -14,7 +14,13 @@ email=cmoe@geoing.ch
 ; experimental flag
 experimental=false
 
-changelog=Ready for QGIS 2.0
+changelog= 0.2.2 Support multipart geometries
+  0.2.1 Chengae by NextGIS (info@nextgis.ru)
+  Add the ability to explicitly choose crs of the input coordinates.
+  Add storing selected crs.
+  Add russian localization.
+  0.2.0
+  Ready for QGIS 2.0
   fixed for use with QGIS > 1.8
 
 ; tags are in comma separated value format, spaces are allowed

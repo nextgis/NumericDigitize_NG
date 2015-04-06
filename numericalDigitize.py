@@ -163,27 +163,33 @@ class NumericalDigitize:
             xform = QgsCoordinateTransform(crsSrc, crsDest)
             transformedPoint = xform.transform( point )
             coords.append(transformedPoint)
-                
+    
+    geometry = None
     if(layer.geometryType() == 1):
       if(len(coords)>=2):
-        g = QgsGeometry().fromPolyline(coords)
-        self.createFeature(g)
+        geometry = QgsGeometry().fromPolyline(coords)
       else:
         QMessageBox.critical(self.iface.mainWindow(),"Error creating feature", "Invalid geometry for geometry type line")
     elif(layer.geometryType()==2):
       if(len(coords)>=3):
         if not(coords[-1] == coords[0]):
           coords.append(coords[0])
-        g = QgsGeometry().fromPolygon([coords])
-        self.createFeature(g)
+        geometry = QgsGeometry().fromPolygon([coords])
       else:
         QMessageBox.critical(self.iface.mainWindow(),"Error creating feature", "Invalid geometry for geometry type polygon")
     else:
       for i in coords:
-        g = QgsGeometry.fromPoint(i)
-        self.createFeature(g)
+        geometry = QgsGeometry.fromPoint(i)
+        
+    if self.hasMultipart(layer):
+        geometry.convertToMultiType()
+        
+    self.createFeature(geometry)
 
- 
+  def hasMultipart(self,layer):
+    for f in layer.getFeatures():
+        if f.geometry().isMultipart():
+            return True
  
   def createFeature(self, geom):
     layer = self.canvas.currentLayer() 
@@ -202,7 +208,8 @@ class NumericalDigitize:
         return False
         
     fields = layer.pendingFields()
-
+    
+    
     try: #API-Break 1.8 vs. 2.0 handling
     	attr = f.initAttributes(len(fields))
     	for i in range(len(fields)):
@@ -212,7 +219,8 @@ class NumericalDigitize:
       ## Add attributefields to feature.
       for i in fields:
         f.addAttribute(i,  provider.defaultValue(i))
-           
+    
+        
     layer.beginEditCommand("Feature added")
     
     #layer.addFeature(f)
