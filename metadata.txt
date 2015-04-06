@@ -4,7 +4,7 @@
 name=NumericDigitize_NG
 qgisMinimumVersion=2.0
 description=Digitize with just the keyboard
-version=version Version 0.2.2
+version=version Version 0.2.3
 author=Cédric Möri
 email=cmoe@geoing.ch
 ; end of mandatory metadata
@@ -14,7 +14,8 @@ email=cmoe@geoing.ch
 ; experimental flag
 experimental=false
 
-changelog= 0.2.2 Support multipart geometries
+changelog= 0.2.3 Change metadata
+  0.2.2 Support multipart geometries
   0.2.1 Chengae by NextGIS (info@nextgis.ru)
   Add the ability to explicitly choose crs of the input coordinates.
   Add storing selected crs.
@@ -30,8 +31,8 @@ tags=digitizing
 ; in a future version of the web application it will
 ; be probably possible to create a project on redmine
 ; if they are not filled
-homepage=http://sourceforge.net/projects/geoing/
-tracker=https://sourceforge.net/apps/trac/geoing/
-repository=http://geoing.svn.sourceforge.net/viewvc/geoing/
+homepage=https://github.com/nextgis/NumericDigitize_NG
+tracker=https://github.com/nextgis/NumericDigitize_NG
+repository=https://github.com/nextgis/NumericDigitize_NG
 icon=vector-create-keyboard.png
 
