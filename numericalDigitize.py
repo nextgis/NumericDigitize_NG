@@ -49,8 +49,8 @@ class NumericalDigitize:
       
   def initGui(self):
     # For i18n support
-    userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/numericalDigitize"
-    systemPluginPath = QgsApplication.prefixPath() + "/python/plugins/numericalDigitize"
+    userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/NumericDigitize_NG"
+    systemPluginPath = QgsApplication.prefixPath() + "/python/plugins/NumericDigitize_NG"
 
     overrideLocale = bool(QSettings().value("locale/overrideFlag", False, bool))
     if not overrideLocale:
@@ -73,7 +73,7 @@ class NumericalDigitize:
     layer = mc.currentLayer()
     
     # Create action that will start plugin configuration
-    self.action = QAction(QIcon(":/plugins/numericalDigitize/vector-create-keyboard.png"), "Numerical Digitize", self.iface.mainWindow())
+    self.action = QAction(QIcon(":/plugins/numericalDigitize/vector-create-keyboard.png"), QCoreApplication.translate("NumericalDigitize", "Create object by coordinates"), self.iface.mainWindow())
     self.action.setEnabled(False)
 
     
@@ -99,10 +99,12 @@ class NumericalDigitize:
     
     #Decide whether the plugin button/menu is enabled or disabled
     if layer <> None:
-      if layer.isEditable() and (layer.geometryType() == 0 or layer.geometryType() == 1 or layer.geometryType() == 2):
+      if layer.isEditable() and (layer.wkbType() in (QGis.WKBPoint, QGis.WKBMultiPoint, QGis.WKBLineString, QGis.WKBMultiLineString, QGis.WKBPolygon, QGis.WKBMultiPolygon) ):
         self.action.setEnabled(True)
-        QObject.connect(layer,SIGNAL("editingStopped()"),self.toggle)
-        QObject.disconnect(layer,SIGNAL("editingStarted()"),self.toggle)
+        #QObject.connect(layer,SIGNAL("editingStopped()"),self.toggle)
+        layer.editingStopped.connect(self.toggle)
+        #QObject.disconnect(layer,SIGNAL("editingStarted()"),self.toggle)
+        layer.editingStarted.connect(self.toggle)
     
       else:
         self.action.setEnabled(False)
@@ -123,7 +125,7 @@ class NumericalDigitize:
     layer = mc.currentLayer()
     
     if layer.isEditable() :
-      d = NdAddFeatureGui(self.iface.mainWindow(), layer.geometryType())
+      d = NdAddFeatureGui(self.iface.mainWindow(), layer.wkbType())
       QObject.connect(d,SIGNAL("numericalFeature(PyQt_PyObject)"),self.createGeom)
       QObject.connect(d, SIGNAL("transformOTF_CRS(PyQt_PyObject)"), self.doTransfromOfCoords)
       QObject.connect(d, SIGNAL("transformFromCrs(long)"), self.doTransformFromCrs)
@@ -165,21 +167,23 @@ class NumericalDigitize:
             coords.append(transformedPoint)
     
     geometry = None
-    if(layer.geometryType() == 1):
+    if( layer.wkbType() in (QGis.WKBLineString, QGis.WKBMultiLineString) ):
       if(len(coords)>=2):
         geometry = QgsGeometry().fromPolyline(coords)
       else:
         QMessageBox.critical(self.iface.mainWindow(),"Error creating feature", "Invalid geometry for geometry type line")
-    elif(layer.geometryType()==2):
+    elif( layer.wkbType() in (QGis.WKBPolygon, QGis.WKBMultiPolygon) ):
       if(len(coords)>=3):
         if not(coords[-1] == coords[0]):
           coords.append(coords[0])
         geometry = QgsGeometry().fromPolygon([coords])
       else:
         QMessageBox.critical(self.iface.mainWindow(),"Error creating feature", "Invalid geometry for geometry type polygon")
-    else:
+    elif( layer.wkbType() in (QGis.WKBPoint, QGis.WKBMultiPoint) ):
       for i in coords:
         geometry = QgsGeometry.fromPoint(i)
+    else:
+        QMessageBox.warning(self.iface.mainWindow(),"Error creating feature", "Invalid geometry wkbType = %s"%( str(layer.wkbType()) ) )
         
     if self.hasMultipart(layer):
         geometry.convertToMultiType()
@@ -187,9 +191,8 @@ class NumericalDigitize:
     self.createFeature(geometry)
 
   def hasMultipart(self,layer):
-    for f in layer.getFeatures():
-        if f.geometry().isMultipart():
-            return True
+    if layer.wkbType() in (QGis.WKBMultiPoint, QGis.WKBMultiLineString, QGis.WKBMultiPolygon):
+        return True
  
   def createFeature(self, geom):
     layer = self.canvas.currentLayer() 

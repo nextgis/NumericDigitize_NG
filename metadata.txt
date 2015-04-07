@@ -4,7 +4,7 @@
 name=NumericDigitize_NG
 qgisMinimumVersion=2.0
 description=Digitize with just the keyboard
-version=version Version 0.2.3
+version=version Version 0.2.4
 author=Cédric Möri
 email=cmoe@geoing.ch
 ; end of mandatory metadata
@@ -14,7 +14,9 @@ email=cmoe@geoing.ch
 ; experimental flag
 experimental=false
 
-changelog= 0.2.3 Change metadata
+changelog=0.2.5 Add tarnslation
+  0.2.4 Use wkbType for geometry identification
+  0.2.3 Change metadata
   0.2.2 Support multipart geometries
   0.2.1 Chengae by NextGIS (info@nextgis.ru)
   Add the ability to explicitly choose crs of the input coordinates.

@@ -81,17 +81,17 @@ class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
                yok = True
              except AttributeError:
                yok = False
-               
+
              if(xok and yok):
                self.twPoints.setRowCount(self.twPoints.rowCount())
                self.twPoints.insertRow(self.twPoints.rowCount())
-               if(self.layertype == 0):
+               if(self.layertype in (QGis.WKBPoint, QGis.WKBMultiPoint) ):
                   if(self.twPoints.rowCount()-1)>=1:
                     self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
-               elif(self.layertype == 1):
+               elif(self.layertype in (QGis.WKBLineString, QGis.WKBMultiLineString  ) ):
                   if(self.twPoints.rowCount()-1)>=2:
                     self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
-               elif(self.layertype == 2):
+               elif(self.layertype in (QGis.WKBPolygon, QGis.WKBMultiPolygon) ):
                   if(self.twPoints.rowCount()-1)>=3:
                     self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
 
