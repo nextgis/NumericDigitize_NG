@@ -9,7 +9,7 @@ import webbrowser, os
 currentPath = os.path.dirname(__file__)
         
 class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
-    def __init__(self, iface, layertype):
+    def __init__(self, iface, layertype, coords):
         self.layertype = layertype
         QDialog.__init__(self, iface)
         self.iface = iface
@@ -41,6 +41,19 @@ class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
         else:
             self.rb_OtherCrs.setChecked(True)
         self.__displayAuthid()
+        
+        row_index = 0
+        for coord in coords:
+            item = QTableWidgetItem(str(coord.x()))
+            item.setText(str(coord.x()))
+            self.twPoints.setItem(row_index,0,item)
+            item = QTableWidgetItem(str(coord.y()))
+            item.setText(str(coord.y()))
+            self.twPoints.setItem(row_index,1,item)
+            row_index = row_index + 1
+            
+        if self.__checkMinFeaturePoints():
+            self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
             
     def selectOtherCrs(self, checked):
         if checked == True:
@@ -63,13 +76,17 @@ class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
             self.l_OtherCrsName.setText(
                 "[%s]"%QgsCoordinateReferenceSystem(self.featureCrsId, QgsCoordinateReferenceSystem.InternalCrsId).authid()
                 )
-            
-    def cellChanged (self, currentRow, currentColumn):
+    
+    def __getPointCoordinate(self, currentRow, currentColumn):
         theValue = self.twPoints.item(currentRow, currentColumn)
-
+        return theValue.text().replace(',', '.')
+    
+    def cellChanged (self, currentRow, currentColumn):      
+        theValueAsString = self.__getPointCoordinate(currentRow, currentColumn)
+        
         #only add a new row, if all cells are used, also be sure, 
         #that only numerics find their way in the table
-        if(self.is_number(theValue.text())):
+        if( self.is_number(theValueAsString) ):
            if((self.twPoints.rowCount() == currentRow+1)) :
              try:
                self.twPoints.item(currentRow, 0).text() != ""
@@ -85,20 +102,24 @@ class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
              if(xok and yok):
                self.twPoints.setRowCount(self.twPoints.rowCount())
                self.twPoints.insertRow(self.twPoints.rowCount())
-               if(self.layertype in (QGis.WKBPoint, QGis.WKBMultiPoint) ):
-                  if(self.twPoints.rowCount()-1)>=1:
-                    self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
-               elif(self.layertype in (QGis.WKBLineString, QGis.WKBMultiLineString  ) ):
-                  if(self.twPoints.rowCount()-1)>=2:
-                    self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
-               elif(self.layertype in (QGis.WKBPolygon, QGis.WKBMultiPolygon) ):
-                  if(self.twPoints.rowCount()-1)>=3:
-                    self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
+               if self.__checkMinFeaturePoints():
+                 self.buttonBox.button(QDialogButtonBox.Ok ).setEnabled(True)
 
         else:
-          theValue.setText("")
+          self.twPoints.item(currentRow, currentColumn).setText("")
         
-      
+    def __checkMinFeaturePoints(self):
+        if(self.layertype in (QGis.WKBPoint, QGis.WKBMultiPoint) ):
+            if(self.twPoints.rowCount()-1)>=1:
+                return True
+        elif(self.layertype in (QGis.WKBLineString, QGis.WKBMultiLineString  ) ):
+            if(self.twPoints.rowCount()-1)>=2:
+                return True
+        elif(self.layertype in (QGis.WKBPolygon, QGis.WKBMultiPolygon) ):
+            if(self.twPoints.rowCount()-1)>=3:
+                return True
+        return False
+    
     def is_number(self, s):
       try:
           float(s)
@@ -122,7 +143,7 @@ class NdAddFeatureGui(QDialog, QObject, Ui_Nd_AddFeature):
       #tell the coords
       coords = []
       for i in range(self.twPoints.rowCount()-1):
-        pt = QgsPoint(float(self.twPoints.item(i, 0).text()), float(self.twPoints.item(i, 1).text()))
+        pt = QgsPoint(float( self.__getPointCoordinate(i, 0) ), float( self.__getPointCoordinate(i, 1) ))
         coords.append(pt)
       self.emit(SIGNAL("numericalFeature(PyQt_PyObject)"), coords)
       

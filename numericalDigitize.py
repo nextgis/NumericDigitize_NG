@@ -108,8 +108,10 @@ class NumericalDigitize:
     
       else:
         self.action.setEnabled(False)
-        QObject.connect(layer,SIGNAL("editingStarted()"),self.toggle)
-        QObject.disconnect(layer,SIGNAL("editingStopped()"),self.toggle)        
+        #QObject.connect(layer,SIGNAL("editingStarted()"),self.toggle)
+        layer.editingStarted.connect(self.toggle)
+        #QObject.disconnect(layer,SIGNAL("editingStopped()"),self.toggle)        
+        layer.editingStopped.connect(self.toggle)
                 
                 
                 
@@ -119,13 +121,13 @@ class NumericalDigitize:
    
     
     
-  def run(self):
+  def run(self, coords = []):
     #Here we go...
     mc = self.canvas
     layer = mc.currentLayer()
     
     if layer.isEditable() :
-      d = NdAddFeatureGui(self.iface.mainWindow(), layer.wkbType())
+      d = NdAddFeatureGui(self.iface.mainWindow(), layer.wkbType(), coords)
       QObject.connect(d,SIGNAL("numericalFeature(PyQt_PyObject)"),self.createGeom)
       QObject.connect(d, SIGNAL("transformOTF_CRS(PyQt_PyObject)"), self.doTransfromOfCoords)
       QObject.connect(d, SIGNAL("transformFromCrs(long)"), self.doTransformFromCrs)
@@ -159,13 +161,18 @@ class NumericalDigitize:
     if self.doTransformCrsIdToLayer:
         coords_tmp = coords[:]
         coords = []
-        for point in coords_tmp:
-            crsSrc = QgsCoordinateReferenceSystem(self.crsId, QgsCoordinateReferenceSystem.InternalCrsId)
-            crsDest = layer.crs()
-            xform = QgsCoordinateTransform(crsSrc, crsDest)
-            transformedPoint = xform.transform( point )
-            coords.append(transformedPoint)
-    
+        try:
+            for point in coords_tmp:
+                crsSrc = QgsCoordinateReferenceSystem(self.crsId, QgsCoordinateReferenceSystem.InternalCrsId)
+                crsDest = layer.crs()
+                xform = QgsCoordinateTransform(crsSrc, crsDest)
+                transformedPoint = xform.transform( point )
+                coords.append(transformedPoint)
+        except QgsCsException as e:
+            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate("NumericalDigitize", "The reprojection error"), e.message.decode('utf-8') )
+            self.run(coords_tmp)
+            return
+        
     geometry = None
     if( layer.wkbType() in (QGis.WKBLineString, QGis.WKBMultiLineString) ):
       if(len(coords)>=2):
