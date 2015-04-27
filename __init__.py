@@ -33,7 +33,7 @@ def name():
 def description():
   return "Digitize with just the keyboard"
 def version():
-  return "Version 0.2.6"
+  return "Version 0.2.7"
 def classFactory(iface):
   return NumericalDigitize(iface)
 def qgisMinimumVersion():
