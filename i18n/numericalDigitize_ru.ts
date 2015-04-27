@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<!DOCTYPE TS>
+<TS version="2.0" language="ru_RU">
 <context>
     <name>NdAddFeatureGui</name>
     <message>
-        <location filename="nd_addfeaturegui.py" line="61"/>
+        <location filename="nd_addfeaturegui.py" line="74"/>
         <source>crs not selected</source>
         <translation>не выбрана</translation>
     </message>
@@ -23,17 +24,17 @@
     <message>
         <location filename="nd_addfeature.ui" line="31"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="nd_addfeature.ui" line="36"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="nd_addfeature.ui" line="41"/>
         <source>Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="nd_addfeature.ui" line="49"/>
@@ -63,7 +64,7 @@
     <message>
         <location filename="nd_addfeature.ui" line="99"/>
         <source>not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>не выбран</translation>
     </message>
 </context>
 <context>
@@ -72,6 +73,11 @@
         <location filename="numericalDigitize.py" line="76"/>
         <source>Create object by coordinates</source>
         <translation>Создание объекта по координатам</translation>
+    </message>
+    <message>
+        <location filename="numericalDigitize.py" line="168"/>
+        <source>The reprojection error</source>
+        <translation>Ошибка перепроецирования</translation>
     </message>
 </context>
 </TS>

@@ -108,12 +108,8 @@ class NumericalDigitize:
     
       else:
         self.action.setEnabled(False)
-        #QObject.connect(layer,SIGNAL("editingStarted()"),self.toggle)
-        layer.editingStarted.connect(self.toggle)
-        #QObject.disconnect(layer,SIGNAL("editingStopped()"),self.toggle)        
-        layer.editingStopped.connect(self.toggle)
-                
-                
+        QObject.connect(layer,SIGNAL("editingStarted()"),self.toggle)
+        QObject.disconnect(layer,SIGNAL("editingStopped()"),self.toggle)
                 
   def deactivate(self):
     #uncheck the button/menu and get rid off the VTTool signal
